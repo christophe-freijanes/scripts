@@ -11,7 +11,7 @@ ffmpeg -y -loglevel error -hide_banner -nostats \
 -filter_complex amix=inputs=2 \
 -f x11grab -hwaccel auto -framerate 60 -video_size 2560x1440 -i :1 \
 -c:a libvorbis -ac 2 -ar 48000 \
--c:v h264_nvenc -preset:v slow $DIRECTORY/tmp.mov
+-c:v h264_nvenc -profile:v high -preset:v slow $DIRECTORY/tmp.mov
 # Stream to Twitch
 #"rtmp://live.twitch.tv/app/xxxxxxxxxxxxxxx"
 
@@ -23,11 +23,11 @@ sleep 3s
 ffmpeg -y -i $DIRECTORY/ENCODEC_AT_$TIME.mov -vf scale=1920x1080 -b:v 1800k \
 -minrate 900k -maxrate 2610k -tile-columns 2 -g 240 -threads 8 \
 -quality good -crf 31 -c:v libvpx-vp9 -c:a libvorbis \
--pass 1 -speed 4 $DIRECTORY/Cast_1920x1080-24-30fps_$TIME.webm && \
+-pass 1 -speed 4 -f webm $DIRECTORY/Cast_$TIME.webm && \
 ffmpeg -y -i $DIRECTORY/ENCODEC_AT_$TIME.mov -vf scale=1920x1080 -b:v 1800k \
 -minrate 900k -maxrate 2610k -tile-columns 3 -g 240 -threads 8 \
 -quality good -crf 31 -c:v libvpx-vp9 -c:a libvorbis \
--pass 2 -speed 4 -y $DIRECTORY/Cast_1920x1080-24-30fps_$TIME.webm
+-pass 2 -speed 4 -y -f webm $DIRECTORY/Cast_$TIME.webm \
 
 sleep 3s
 # Delete file capture not compressing
