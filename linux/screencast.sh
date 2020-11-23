@@ -1,7 +1,7 @@
 #!/bin/bash
 # Screen Recorder
 DIRECTORY=/home/christophe/Vidéos/ScreenCaptures
-TIME=$( date +'%Y-%m-%d_%H:%M' )
+TIME=$( date +'%d-%m-%Y_%H:%M' )
 
 # Capture Screen or stream
 ffmpeg -y -loglevel error -hide_banner -nostats \
@@ -10,21 +10,27 @@ ffmpeg -y -loglevel error -hide_banner -nostats \
 -f pulse -ac 2 -ar 48000 -i alsa_input.usb-SteelSeries_SteelSeries_Arctis_5_00000000-00.analog-chat \
 -filter_complex amix=inputs=2 \
 -f x11grab -hwaccel auto -framerate 60 -video_size 2560x1440 -i :1 \
--c:v h264_nvenc \
--c:a libvorbis -strict -2 -b:a 320k \
--nostdin /home/christophe/Vidéos/ScreenCaptures/tmp.mkv \
+-c:a libvorbis -ac 2 -ar 48000 \
+-c:v h264_nvenc -preset:v slow $DIRECTORY/tmp.mov
 # Stream to Twitch
 #"rtmp://live.twitch.tv/app/xxxxxxxxxxxxxxx"
 
 # Rename the file tmp.mkv
-mv $DIRECTORY/tmp.mkv $DIRECTORY/ENCODEC_AT_$TIME.mkv
+mv $DIRECTORY/tmp.mov $DIRECTORY/ENCODEC_AT_$TIME.mov
 sleep 3s
 
 # Encodage VP9
-ffmpeg -y -loglevel error -hide_banner -i $DIRECTORY/ENCODEC_AT_$TIME.mkv -framerate 60 -c:v libvpx-vp9 -cpu-used 0 -pix_fmt yuva420p -b:v 0 -crf 30 -row-mt 1 -f webm $DIRECTORY/Record_AT_$TIME.webm
-sleep 3s
+ffmpeg -y -i $DIRECTORY/ENCODEC_AT_$TIME.mov -vf scale=1920x1080 -b:v 1800k \
+-minrate 900k -maxrate 2610k -tile-columns 2 -g 240 -threads 8 \
+-quality good -crf 31 -c:v libvpx-vp9 -c:a libvorbis \
+-pass 1 -speed 4 $DIRECTORY/Cast_1920x1080-24-30fps_$TIME.webm && \
+ffmpeg -y -i $DIRECTORY/ENCODEC_AT_$TIME.mov -vf scale=1920x1080 -b:v 1800k \
+-minrate 900k -maxrate 2610k -tile-columns 3 -g 240 -threads 8 \
+-quality good -crf 31 -c:v libvpx-vp9 -c:a libvorbis \
+-pass 2 -speed 4 -y $DIRECTORY/Cast_1920x1080-24-30fps_$TIME.webm
 
+sleep 3s
 # Delete file capture not compressing
-rm -rf $DIRECTORY/ENCODEC_AT_$TIME.mkv
+rm -rf $DIRECTORY/ENCODEC_AT_$TIME.mov
 
 exit 0
