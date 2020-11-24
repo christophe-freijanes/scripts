@@ -20,12 +20,12 @@ mv $DIRECTORY/tmp.mov $DIRECTORY/ENCODEC_AT_$TIME.mov
 sleep 3s
 
 # Encodage VP9
-ffmpeg -y -i $DIRECTORY/ENCODEC_AT_$TIME.mov -vf scale=2560x1440 -b:v 1800k \
--minrate 900k -maxrate 2610k -tile-columns 2 -g 240 -threads 8 \
+ffmpeg -y -i $DIRECTORY/ENCODEC_AT_$TIME.mov -vf scale=2560x1440 -b:v 10000k \
+-minrate 9000k -maxrate 26100k -tile-columns 2 -g 240 -threads 8 \
 -quality good -crf 31 -c:v libvpx-vp9 -c:a libvorbis \
 -pass 1 -speed 4 -f webm $DIRECTORY/Cast_$TIME.webm && \
-ffmpeg -y -i $DIRECTORY/ENCODEC_AT_$TIME.mov -vf scale=2560x1440 -b:v 1800k \
--minrate 900k -maxrate 2610k -tile-columns 3 -g 240 -threads 8 \
+ffmpeg -y -i $DIRECTORY/ENCODEC_AT_$TIME.mov -vf scale=2560x1440 -b:v 10000k \
+-minrate 9000k -maxrate 26100k -tile-columns 3 -g 240 -threads 8 \
 -quality good -crf 31 -c:v libvpx-vp9 -c:a libvorbis \
 -pass 2 -speed 4 -y $DIRECTORY/Cast_$TIME.webm \
 
